@@ -9,8 +9,13 @@ tasks:
     desc: Build the docker image
     cmds:
     - poetry export --without-hashes --format=requirements.txt > requirements.txt
-    - docker build -t lab1 .
+    - docker build -t lab1-image .
   serve:
     desc: Run the docker image
     cmds:
-    - docker run -p 5000:8000 -d lab1
+    - docker run -p 5000:8000 -d --name lab1-container lab1-image
+  kill:
+    desc: Terminate the docker container
+    cmds:
+    - docker stop lab1-container
+    - docker rm lab1-container

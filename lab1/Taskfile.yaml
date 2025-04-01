@@ -1,0 +1,16 @@
+version: '3'
+tasks:
+  dev:
+    desc: Run the docker image in development mode
+    cmds:
+    - poetry install
+    - poetry run fastapi run server.py
+  build:
+    desc: Build the docker image
+    cmds:
+    - poetry export --without-hashes --format=requirements.txt > requirements.txt
+    - docker build -t lab1 .
+  serve:
+    desc: Run the docker image
+    cmds:
+    - docker run -p 5000:8000 -d lab1

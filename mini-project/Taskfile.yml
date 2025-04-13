@@ -1,0 +1,10 @@
+version: '3'
+tasks:
+  install:
+    desc: Install dependencies
+    cmds:
+    - poetry install
+  dev:
+    desc: Run the application in development mode
+    cmds:
+    - poetry run fastapi run monolithic_backend.py

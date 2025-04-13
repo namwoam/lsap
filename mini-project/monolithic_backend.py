@@ -91,7 +91,7 @@ async def upload_image(user_id: int, file: UploadFile = File(...)):
         session.add(image)
         session.commit()
         session.refresh(image)
-    return {"status": "success", "image_url": file_path}
+    return {"status": "success", "image_id": image.id}
 
 
 @app.get("/image/{image_id}")
@@ -152,7 +152,7 @@ async def upload_video(user_id: int, file: UploadFile = File(...)):
         session.add(video)
         session.commit()
         session.refresh(video)
-    return {"status": "success", "video_url": file_path}
+    return {"status": "success", "video_id": video.id}
 
 
 @app.post("/message")

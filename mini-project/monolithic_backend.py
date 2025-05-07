@@ -33,8 +33,8 @@ class Message(SQLModel, table=True):
     sender_id: int = Field(foreign_key="user.id")
     receiver_id: int = Field(foreign_key="user.id")
     text: str | None = Field(default=None, max_length=500)
-    image_url: str | None = Field(default=None, max_length=500)
-    video_url: str | None = Field(default=None, max_length=500)
+    image_id: int | None = Field(foreign_key="image.id")
+    video_id: int | None = Field(foreign_key="video.id")
 
 
 class Image(SQLModel, table=True):
@@ -267,19 +267,33 @@ def search_users(name: str = None, email: str = None):
 
 
 @app.get("/users/recommendations")
-def get_recommendations(user_id: int, limit: int = 10):
-    """Get user recommendations based on keywords."""
+def get_recommendations(user_id: int, limit: int = 10, thrd: int = 3):
+    """Get user recommendations based on keywords matching"""
     with Session(engine) as session:
         user = session.get(User, user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        keywords = user.keywords.split(",") if user.keywords else []
-        recommendations = session.exec(
-            select(User)
-            .where(User.id != user_id)
-            .where(User.bio.contains(keywords))
-            .limit(limit)
-        ).all()
+
+        # Extract keywords for the current user
+        user_keywords = set(user.keywords.split(",")) if user.keywords else set()
+        if not user_keywords:
+            return {"status": "success", "recommendations": []}
+
+        # Query for users with overlapping keywords
+        query = select(User).where(User.id != user_id)  # Exclude the current user
+        users = session.exec(query).all()
+
+        # Filter users based on keyword overlap and threshold
+        recommendations = [
+            other_user
+            for other_user in users
+            if len(user_keywords.intersection(set(other_user.keywords.split(","))))
+            > thrd
+        ]
+
+        # Limit the number of recommendations
+        recommendations = recommendations[:limit]
+
     return {"status": "success", "recommendations": recommendations}
 
 

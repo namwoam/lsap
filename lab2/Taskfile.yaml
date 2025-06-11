@@ -1,0 +1,13 @@
+version: '3'
+tasks:
+  build:
+    desc: Build the docker image
+    cmds:
+    - poetry export --without-hashes --format=requirements.txt > requirements.txt
+    - docker build -t lab2-image:v1.0 -f Dockerfile-v1 .
+    - docker build -t lab2-image:v2.0 -f Dockerfile-v2 .
+  load:
+    desc: Load the docker image into the minikube cluster
+    cmds:
+    - minikube image load lab2-image:v1.0
+    - minikube image load lab2-image:v2.0

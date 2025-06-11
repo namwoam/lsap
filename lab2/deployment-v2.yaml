@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab2-deployment
+  labels:
+    app: lab2
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: lab2
+  template:
+    metadata:
+      labels:
+        app: lab2
+    spec:
+      containers:
+      - name: lab2-container
+        image: lab2-image:v2.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
